@@ -1,5 +1,4 @@
 
-
 import { JobCard } from './JobCard.jsx'
 
 export function JobListings ({ jobs }) {

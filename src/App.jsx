@@ -7,13 +7,11 @@ import Footer from './components/Footer'
 import { JobListings } from "../src/components/JobListings.jsx" 
 import allJobsData from "../src/data.json"
 
-// Definimos la cantidad de trabajos por página
+// Definimos la cantidad de trabajos a mostrar por página
 const JOBS_PER_PAGE = 5;
 
 function App() {
   const [currentPage, setCurrentPage] = useState(1)
-  
-
   // 1. Lógica de Paginación
   const totalJobs = allJobsData.length;
   const totalPages = Math.ceil(totalJobs / JOBS_PER_PAGE);
