@@ -6,7 +6,7 @@
     "ubicacion": "Remoto",
     "descripcion": "Buscamos un ingeniero de software con experiencia en desarrollo web y conocimientos en JavaScript, React y Node.js. El candidato ideal debe ser capaz de trabajar en equipo y tener buenas habilidades de comunicación.",
     "data": {
-      "technology": ["react", "nodejs", "javascript"],
+      "technology": "javascript",
       "modalidad": "remoto",
       "nivel": "senior"
     }
@@ -114,7 +114,7 @@
     "ubicacion": "Bogotá",
     "descripcion": "Estamos buscando un desarrollador backend con experiencia en Node.js, Express y bases de datos NoSQL. Se requiere conocimiento en arquitectura de microservicios.",
     "data": {
-      "technology": "nodejs",
+      "technology": "node",
       "modalidad": "bogota",
       "nivel": "mid"
     }
@@ -180,4 +180,3 @@
     }
   }
 ]
-

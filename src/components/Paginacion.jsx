@@ -1,5 +1,3 @@
-import JobCard from "./JobCard" 
-
 
 
 const Paginacion = ({currentPage = 1, totalPages = 10, onPageChange}) => {
@@ -36,12 +34,6 @@ const Paginacion = ({currentPage = 1, totalPages = 10, onPageChange}) => {
   return (
     <>
     <section>
-        <h2 style={{textAlign: "center"}}>Resultados de búsqueda</h2>
-
-        <div className="jobs-listings">
-          {/* <!-- Aquí se insertan los empleos dinámicamente --> */}
-          <JobCard />
-        </div>
 
         <nav className="pagination">
           
