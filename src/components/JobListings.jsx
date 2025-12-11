@@ -1,7 +1,7 @@
 
 import { JobCard } from './JobCard.jsx'
 
-export function JobListings ({ jobs }) {
+function JobListings ({ jobs }) {
   return (
     <>
       <div className="jobs-listings">
@@ -18,3 +18,5 @@ export function JobListings ({ jobs }) {
     </>
   )
 }
+
+export default JobListings

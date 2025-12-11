@@ -2,7 +2,7 @@
 
 
 // CORRECCIÓN: Ahora solo recibe onFilterChange como prop principal
-const FiltroCentarl = ( {onFilterChange} ) => {
+const FiltroCentral = ( {onFilterChange} ) => {
 
 
 
@@ -113,4 +113,4 @@ const FiltroCentarl = ( {onFilterChange} ) => {
   )
 }
 
-export default FiltroCentarl
+export default FiltroCentral

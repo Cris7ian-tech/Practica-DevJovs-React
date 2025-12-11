@@ -1,14 +1,13 @@
-import { useState } from "react";
 
-import FiltroCentarl from "../components/FiltroCentarl.jsx";
-import Paginacion from "../components/Paginacion.jsx";
-import JobListings from "../components/JobListings.jsx";
-import allJobsData from "../src/data.json";
-
+import { useState } from 'react'
+import Paginacion from '../components/Paginacion'
+import FiltroCentral from '../components/FiltroCentral' 
+import JobListings from '../components/JobListings' 
+import allJobsData from '../data.json' 
 // Definimos la cantidad de trabajos a mostrar por página
 const JOBS_PER_PAGE = 5;
 
-export function SearchPage() {
+function SearchPage() {
   // Guardamos Filtros: Estado unificado para todos los criterios de filtrado
   const [filters, setFilters] = useState({
     text: "",
@@ -85,7 +84,7 @@ export function SearchPage() {
   return (
     <>
       <main>
-        <FiltroCentarl onFilterChange={handleFilterChange} />
+        <FiltroCentral onFilterChange={handleFilterChange} />
 
         {/* Renderizamos el h2 y la lista de trabajos */}
         <section>
@@ -106,3 +105,5 @@ export function SearchPage() {
     </>
   );
 }
+
+export default SearchPage
