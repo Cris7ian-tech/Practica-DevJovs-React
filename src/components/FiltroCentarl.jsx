@@ -1,6 +1,36 @@
+import { useId } from "react";
+
+const FiltroCentarl = ( {onTextFilter ,onSearch} ) => {
+  const idText = useId()
+  const idTechnology = useId()
+  const idLocation = useId()
+  const idLevel = useId()
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Recuperamos la informacion del formulario
+    const formData = new FormData(event.target)
+
+    const filters = {
+      text: formData.get(idText),
+      technology: formData.get(idTechnology),
+      location: formData.get(idLocation),
+      level: formData.get(idLevel)
+    }
+    console.log(filters)
+
+    onSearch(filters)
+  }
+
+  const handleTextChange = (event) => {
+    const text = event.target.value
+    onTextFilter(text)
+  }
 
 
-const FiltroCentarl = () => {
+
+
+
   return (
     <>
 
@@ -8,7 +38,7 @@ const FiltroCentarl = () => {
         <h1>Encuentra tu próximo trabajo</h1>
         <p>Explora miles de oportunidades en el sector tecnológico.</p>
 
-        <form id="empleos-search-form" role="search">
+        <form onSubmit={handleSubmit} id="empleos-search-form" role="search">
           <div className="search-bar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
@@ -17,15 +47,18 @@ const FiltroCentarl = () => {
               <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
               <path d="M21 21l-6 -6" />
             </svg>
-
-            <input 
-              name="search" id="empleos-search-input" required type="text"
-              placeholder="Buscar trabajos, empresas o habilidades"
-            />
+            
+              <input 
+                name={idText} id="empleos-search-input" required type="text"
+                placeholder="Buscar trabajos, empresas o habilidades"
+                onChange={handleTextChange}
+              />
+              <button type="submit">Buscar</button>
+              
           </div>
 
           <div className="search-filters">
-            <select name="technology" id="filter-technology">
+            <select name={idTechnology} id="filter-technology">
               <option value="">Tecnología</option>
               <optgroup label="Tecnologías populares">
                 <option value="javascript">JavaScript</option>
@@ -43,7 +76,7 @@ const FiltroCentarl = () => {
               <option value="php">PHP</option>
             </select>
 
-            <select name="location" id="filter-location">
+            <select name={idLocation} id="filter-location">
               <option value="">Ubicación</option>
               <option value="remoto">Remoto</option>
               <option value="cdmx">Ciudad de México</option>
@@ -52,7 +85,7 @@ const FiltroCentarl = () => {
               <option value="barcelona">Barcelona</option>
             </select>
 
-            <select name="experience-level" id="filter-experience-level">
+            <select name={idLevel} id="filter-experience-level">
               <option value="">Nivel de experiencia</option>
               <option value="junior">Junior</option>
               <option value="mid">Mid-level</option>
