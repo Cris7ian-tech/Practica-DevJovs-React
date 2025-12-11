@@ -56,7 +56,6 @@ const FiltroCentarl = ( {onFilterChange} ) => {
                 placeholder="Buscar trabajos, empresas o habilidades"
                 onChange={handleTextChange} //filtro de texto instantaneo
               />
-              <button type="submit">Buscar</button>
           </div>
 
           <div className="search-filters">
