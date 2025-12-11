@@ -1,35 +1,38 @@
-import { useId } from "react";
+// import { useId } from "react";
 
-const FiltroCentarl = ( {onTextFilter ,onSearch} ) => {
-  const idText = useId()
-  const idTechnology = useId()
-  const idLocation = useId()
-  const idLevel = useId()
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Recuperamos la informacion del formulario
-    const formData = new FormData(event.target)
+// CORRECCIÓN: Ahora solo recibe onFilterChange como prop principal
+const FiltroCentarl = ( {onFilterChange} ) => {
 
-    const filters = {
-      text: formData.get(idText),
-      technology: formData.get(idTechnology),
-      location: formData.get(idLocation),
-      level: formData.get(idLevel)
-    }
-    console.log(filters)
 
-    onSearch(filters)
-  }
 
-  const handleTextChange = (event) => {
+  // 1- Manejamos el input text de forma instantanea
+    const handleTextChange = (event) => {
     const text = event.target.value
-    onTextFilter(text)
+    //a) Envia el texto a la funcion principal y actualiza el filtro "Text"
+    onFilterChange("text", text)
+  };
+
+  
+  // 2- Manejar los Selectores (al cambiar un valor en un select)
+  const handleSelectChange = (event) => {
+    const name = event.target.name // obtiene el nombre del select: "technology", "location", "level"
+    const value = event.target.value // obtiene el valor del select: "react", "javaScript"
+    
+    // a) Llama a App.jsx para actualizar el filtro especifico
+    onFilterChange(name, value)
+  };
+
+  // Usaremos el handleSubmit (Botón Buscar) solo para forzar una búsqueda
+  // pero es más común que los selectores filtren al instante.
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    console.log("Filtros listos para ser aplicados/enviados.");
   }
 
 
 
-
+  // Usaremos nombres claros para los selects, sin useId, ya que los usaremos en handleSelectChange
 
   return (
     <>
@@ -49,16 +52,16 @@ const FiltroCentarl = ( {onTextFilter ,onSearch} ) => {
             </svg>
             
               <input 
-                name={idText} id="empleos-search-input" required type="text"
+                name="text" id="empleos-search-input" required type="text"
                 placeholder="Buscar trabajos, empresas o habilidades"
-                onChange={handleTextChange}
+                onChange={handleTextChange} //filtro de texto instantaneo
               />
               <button type="submit">Buscar</button>
-              
           </div>
 
           <div className="search-filters">
-            <select name={idTechnology} id="filter-technology">
+            {/* El nombre del select debe coincidir con la clave del estado en App.jsx (technology) */}
+            <select name="technology" id="filter-technology" onChange={handleSelectChange}>
               <option value="">Tecnología</option>
               <optgroup label="Tecnologías populares">
                 <option value="javascript">JavaScript</option>
@@ -76,7 +79,8 @@ const FiltroCentarl = ( {onTextFilter ,onSearch} ) => {
               <option value="php">PHP</option>
             </select>
 
-            <select name={idLocation} id="filter-location">
+            {/* Nombre del select debe ser 'location' */}
+            <select name="location" id="filter-location" onChange={handleSelectChange}>
               <option value="">Ubicación</option>
               <option value="remoto">Remoto</option>
               <option value="cdmx">Ciudad de México</option>
@@ -85,7 +89,8 @@ const FiltroCentarl = ( {onTextFilter ,onSearch} ) => {
               <option value="barcelona">Barcelona</option>
             </select>
 
-            <select name={idLevel} id="filter-experience-level">
+            {/* Nombre del select debe ser 'level' */}
+            <select name="level" id="filter-experience-level" onChange={handleSelectChange}>
               <option value="">Nivel de experiencia</option>
               <option value="junior">Junior</option>
               <option value="mid">Mid-level</option>
