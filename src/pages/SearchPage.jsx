@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Paginacion from '../components/Paginacion'
 import FiltroCentral from '../components/FiltroCentral' 
 import JobListings from '../components/JobListings' 
@@ -78,6 +78,15 @@ function SearchPage() {
     }));
     setCurrentPage(1); // Reiniciar la página al cambiar el filtro
   };
+
+
+// USE EFFECT -> operaciones que afectan a algo que esta fuera del componente
+  useEffect(() => {
+    document.title = `Resultados: ${jobsFiltered.length} - Page ${currentPage} - DevJovs`;
+  }, [jobsFiltered ,currentPage]); //Aqui cambiamos titulo de la pestaña al ir a page /search
+
+
+
 
   // Pasamos funcion unificada al componente Filtro
 
