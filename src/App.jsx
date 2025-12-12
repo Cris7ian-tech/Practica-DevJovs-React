@@ -23,6 +23,7 @@ function App() {
   useEffect(() => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname)
+      console.log("Cambio de url:", window.location.pathname)
     };
 
     window.addEventListener("popstate", handleLocationChange);
@@ -32,7 +33,7 @@ function App() {
     };
   }, [])
 
-
+  
 
   return (
     <>

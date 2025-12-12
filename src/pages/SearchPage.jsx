@@ -85,9 +85,6 @@ function SearchPage() {
     document.title = `Resultados: ${jobsFiltered.length} - Page ${currentPage} - DevJovs`;
   }, [jobsFiltered ,currentPage]); //Aqui cambiamos titulo de la pestaña al ir a page /search
 
-
-
-
   // Pasamos funcion unificada al componente Filtro
 
   return (
