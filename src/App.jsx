@@ -1,44 +1,19 @@
-import { useEffect, useState } from 'react'
 
 import Header from './components/Header'
-import Footer from './components/Footer' // Corregida la ruta
+import Footer from './components/Footer' // Corregida las ruta
 import HomePage from './pages/HomePage'
-import SearchPage from './pages/SearchPage'
-import NotFoundPage from './pages/404'
 
+import Route from './components/Route'
+import SearchPage from './pages/SearchPage';
 
 function App() {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname); //identificar path actual, en que page estoy
-  
-  let page = <NotFoundPage /> //page por defecto, si no encuentra ninguna page -> 404
-  
-  if (currentPath === "/") {
-    page = <HomePage />
-  } else if (currentPath === "/search") {
-    page = <SearchPage />
-  }
-
-
-  // Actualizamos el path actual cada vez que cambia la URL
-  useEffect(() => {
-    const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname)
-      console.log("Cambio de url:", window.location.pathname)
-    };
-
-    window.addEventListener("popstate", handleLocationChange);
-        //limpiamos efectos
-    return () => {
-      window.removeEventListener("popstate", handleLocationChange);
-    };
-  }, [])
 
   
-
   return (
     <>
       <Header />
-      {page}
+      <Route path="/" component={HomePage} />
+      <Route path="/search" component={SearchPage} />
       <Footer />
     </>
   );

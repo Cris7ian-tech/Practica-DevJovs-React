@@ -1,13 +1,74 @@
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Paginacion from '../components/Paginacion'
 import FiltroCentral from '../components/FiltroCentral' 
 import JobListings from '../components/JobListings' 
-import allJobsData from '../data.json' 
+
+
+// 1- Funcion de Filtrado Maestra
+const getFilteredJobs = (jobs, filters) => {
+  let filtered = jobs;
+
+  // Función de utilidad para eliminar acentos
+  const normalizeString = (str) => {
+        if (!str) return '';
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    };
+
+
+  // A) Filtro por Texto
+  if (filters.text) {
+        const searchText = normalizeString(filters.text);
+        
+        filtered = filtered.filter((job) => {
+            
+            // Normalizamos todos los campos antes de buscar
+            const matchInTitle = normalizeString(job.titulo).includes(searchText);
+            const matchInDescription = normalizeString(job.descripcion).includes(searchText);
+            const matchInCompany = normalizeString(job.empresa).includes(searchText);
+            const matchInUbicacion = normalizeString(job.ubicacion).includes(searchText);
+            
+            return matchInTitle || matchInDescription || matchInCompany || matchInUbicacion;
+        });
+    }
+
+  //B) filtro por tecmologia
+  if (filters.technology) {
+      // 1. Convertir el filtro a minúsculas
+      const filterValue = filters.technology.toLowerCase();
+      
+      filtered = filtered.filter(
+        // 2. Usar Array.includes() para ver si la tecnología está en el array del job
+        (job) => job.data.technology.includes(filterValue)
+      );
+    }
+
+  // C) Filtro por Ubicacion
+  if (filters.location) {
+    const filterValue = normalizeString(filters.location);
+    filtered = filtered.filter(
+      (job) => normalizeString(job.data.modalidad) === filterValue
+      );
+    }
+
+  // D) Filtro por Nivel
+  if (filters.level) {
+    const filterValue = normalizeString(filters.level);
+    filtered = filtered.filter(
+        (job) => normalizeString(job.data.nivel) === filterValue
+    );
+  }
+
+  return filtered;
+};
+
+
 // Definimos la cantidad de trabajos a mostrar por página
 const JOBS_PER_PAGE = 5;
 
 function SearchPage() {
+  const [jobsData, setJobsData] = useState([]); // Donde guardamos los datos completos de la API
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   // Guardamos Filtros: Estado unificado para todos los criterios de filtrado
   const [filters, setFilters] = useState({
     text: "",
@@ -16,100 +77,107 @@ function SearchPage() {
     level: "",
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
 
-  // 1- Funcion de Filtrado Maestra
-  const getFilteredJobs = (jobs) => {
-    let filtered = jobs;
-
-    // A) Filtro por Texto
-    if (filters.text) {
-      const searchText = filters.text.toLowerCase();
-      filtered = filtered.filter((job) =>
-        job.titulo.toLowerCase().includes(searchText)
-      );
-    }
-
-    //B) filtro por tecmologia
-    if (filters.technology) {
-      filtered = filtered.filter(
-        (job) => job.data.technology === filters.technology
-      );
-    }
-
-    // C) Filtro por Ubicacion
-    if (filters.location) {
-      filtered = filtered.filter(
-        (job) => job.data.modalidad === filters.location
-      );
-    }
-
-    // D) Filtro por Nivel
-    if (filters.level) {
-      filtered = filtered.filter((job) => job.data.nivel === filters.level);
-    }
-
-    return filtered;
-  };
-
-  // 2-  Obtenemos Lista final de trabajos Filtrados
-  const jobsFiltered = getFilteredJobs(allJobsData);
-
-  // 3- Paginacion y Slicing
-  const totalJobs = jobsFiltered.length;
-  const totalPages = Math.ceil(totalJobs / JOBS_PER_PAGE);
-
-  // a) Cálculo del Subconjunto de Datos (Slicing)
-  const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
-  const endIndex = startIndex + JOBS_PER_PAGE;
-  // Obtenemos solo los trabajos para la página actual
-  const jobsOnPage = jobsFiltered.slice(startIndex, endIndex);
-
-  const handlePageChange = (page) => {
-    console.log(`Navegando a la página ${page}`);
-    setCurrentPage(page);
-  };
-
-  // 4- HANDLER UNIFICADO para todos los cambios de filtro
-  const handleFilterChange = (filterName, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterName]: value,
-    }));
-    setCurrentPage(1); // Reiniciar la página al cambiar el filtro
-  };
-
-
-// USE EFFECT -> operaciones que afectan a algo que esta fuera del componente
+  //EFECTO PARA EL FETCH (Se ejecuta solo al montar: [])
   useEffect(() => {
-    document.title = `Resultados: ${jobsFiltered.length} - Page ${currentPage} - DevJovs`;
-  }, [jobsFiltered ,currentPage]); //Aqui cambiamos titulo de la pestaña al ir a page /search
+    async function fetchJobs() {
+      try {
+        //usamos setLoading(true) para indicar que estamos cargando los datos
+        setLoading(true);
+        const response = await fetch("https://jscamp-api.vercel.app/api/jobs");
+        const json = await response.json();
+        // Guardamos los datos completos en jobsData (que antes era allJobsData)
+        setJobsData(json.data);
+      } catch (error) {
+        console.error("Error fetching jobs:", error)
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  // Pasamos funcion unificada al componente Filtro
+    fetchJobs();
+  }, []);
 
-  return (
-    <>
-      <main>
-        <FiltroCentral onFilterChange={handleFilterChange} />
+  // Integrar useMemo
+  //  Uso de useMemo con la función externa
+    const { totalJobs, totalPages, jobsOnPage } = useMemo(() => {
+        
+        // ➡️ Llama a la función que definiste arriba, pasándole los estados:
+        const filtered = getFilteredJobs(jobsData, filters); 
+        
+        // 3. Paginacion y Slicing (Esto ya lo tenías bien)
+        const total = filtered.length;
+        const totalPages = Math.ceil(total / JOBS_PER_PAGE);
 
-        {/* Renderizamos el h2 y la lista de trabajos */}
-        <section>
-          <h2 style={{ textAlign: "center" }}>
-            Resultados de búsqueda ({totalJobs})
-          </h2>
-          {/* Pasar solo los trabajos de la página actual */}
-          <JobListings jobs={jobsOnPage} />
-          {totalJobs > 0 && ( // Solo mostrar paginación si hay trabajos
-            <Paginacion
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          )}
-        </section>
-      </main>
-    </>
-  );
+        const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
+        const endIndex = startIndex + JOBS_PER_PAGE;
+        const jobsOnPage = filtered.slice(startIndex, endIndex);
+
+        return { totalJobs: total, totalPages, jobsOnPage };
+
+    }, [jobsData, filters, currentPage]);
+
+    //  HANDLERS
+
+    const handlePageChange = (page) => {
+        console.log(`Navegando a la página ${page}`);
+        setCurrentPage(page);
+    };
+
+    const handleFilterChange = (filterName, value) => {
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [filterName]: value,
+        }));
+        setCurrentPage(1); // Reiniciar la página al cambiar el filtro
+    };
+    
+    //  EFECTO SECUNDARIO (Título del documento)
+    useEffect(() => {
+        document.title = `Resultados: ${totalJobs} - Page ${currentPage} - DevJovs`;
+    }, [totalJobs, currentPage]);
+
+
+    //  RENDERIZADO CONDICIONAL
+    if (loading) {
+        return (
+            <main>
+                <h2 style={{ textAlign: "center", marginTop: "50px" }}>
+                    Cargando trabajos... ⏳
+                </h2>
+            </main>
+        );
+    }
+    
+    //  RENDERIZADO PRINCIPAL
+    return (
+        <>
+            <main>
+                <FiltroCentral onFilterChange={handleFilterChange} />
+
+                <section>
+                    <h2 style={{ textAlign: "center" }}>
+                        Resultados de búsqueda ({totalJobs})
+                    </h2>
+                    
+                    {/* Pasar solo los trabajos de la página actual */}
+                    <JobListings jobs={jobsOnPage} />
+                    
+                    {totalJobs > 0 && ( // Solo mostrar paginación si hay trabajos
+                        <Paginacion
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
+                </section>
+            </main>
+        </>
+    );
 }
 
-export default SearchPage
+export default SearchPage;
+
+
+
+

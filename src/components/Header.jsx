@@ -18,6 +18,8 @@ function Header() {
 
       <nav> 
         <Link href="/search">Empleos</Link>
+
+        {/* <a href="/search">Sin SPA</a> */}
       </nav>      
     </header>
   )

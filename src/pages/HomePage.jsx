@@ -1,6 +1,22 @@
+import useRouter from "../hooks/useRouter"
 
 
 function HomePage() {
+  const { navigateTo } = useRouter()
+
+  const handleSearch = (event) => {
+    event.preventDefault()
+    const formData = new FormData(event.target)
+    const searchTerm = formData.get("search")    
+
+
+    const url = searchTerm !== ""
+    ? `/search?text=${encodeURIComponent(searchTerm)}`
+    : "/search"
+
+    navigateTo(url)
+  }
+
 
   return (
     <>
@@ -12,7 +28,7 @@ function HomePage() {
 
           <p>Únete a la comunidad más grande de desarrolladores y encuentra tu próxima oportunidad.</p>
 
-          <form role="search">
+          <form role="search" onSubmit={handleSearch}>
             <div>
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
