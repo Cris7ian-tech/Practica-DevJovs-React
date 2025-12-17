@@ -2,7 +2,7 @@
 
 
 // CORRECCIÓN: Ahora solo recibe onFilterChange como prop principal
-const FiltroCentral = ( {onFilterChange} ) => {
+const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
 
 
 
@@ -55,12 +55,17 @@ const FiltroCentral = ( {onFilterChange} ) => {
                 name="text" id="empleos-search-input" required type="text"
                 placeholder="Buscar trabajos, empresas o habilidades"
                 onChange={handleTextChange} //filtro de texto instantaneo
+                value={currentFilters.text}
               />
           </div>
 
           <div className="search-filters">
             {/* El nombre del select debe coincidir con la clave del estado en App.jsx (technology) */}
-            <select name="technology" id="filter-technology" onChange={handleSelectChange}>
+            <select name="technology" 
+            id="filter-technology" 
+            onChange={handleSelectChange}
+            value={currentFilters.technology}
+            >
               <option value="">Tecnología</option>
               <optgroup label="Tecnologías populares">
                 <option value="javascript">JavaScript</option>

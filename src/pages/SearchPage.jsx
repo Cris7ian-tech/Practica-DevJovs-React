@@ -2,17 +2,26 @@ import { useEffect, useState, useMemo } from 'react'
 import Paginacion from '../components/Paginacion'
 import FiltroCentral from '../components/FiltroCentral' 
 import JobListings from '../components/JobListings' 
+import { useSearchParams } from 'react-router-dom';
 
 
-// 1- Funcion de Filtrado Maestra
+// =========================================================
+// FUNCIONES AUXILIARES (DEBEN IR FUERA DEL COMPONENTE)
+// =========================================================
+
+// 1 - Función de utilidad para eliminar acentos (DEBE IR AQUÍ, AL PRINCIPIO DEL ARCHIVO)
+const normalizeString = (str) => {
+    // Verificamos si str es null, undefined, o no es un string. 
+    if (typeof str !== 'string' || !str) {
+        return '';
+    }
+    // Aseguramos que solo se use .normalize() en un string válido
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+};
+
+// 2- Funcion de Filtrado Maestra
 const getFilteredJobs = (jobs, filters) => {
   let filtered = jobs;
-
-  // Función de utilidad para eliminar acentos
-  const normalizeString = (str) => {
-        if (!str) return '';
-        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    };
 
 
   // A) Filtro por Texto
@@ -30,6 +39,7 @@ const getFilteredJobs = (jobs, filters) => {
             return matchInTitle || matchInDescription || matchInCompany || matchInUbicacion;
         });
     }
+  
 
   //B) filtro por tecmologia
   if (filters.technology) {
@@ -57,10 +67,12 @@ const getFilteredJobs = (jobs, filters) => {
         (job) => normalizeString(job.data.nivel) === filterValue
     );
   }
-
+  
   return filtered;
+
 };
 
+//////////////////////////////////////////////////////////////////
 
 // Definimos la cantidad de trabajos a mostrar por página
 const JOBS_PER_PAGE = 5;
@@ -69,12 +81,13 @@ function SearchPage() {
   const [jobsData, setJobsData] = useState([]); // Donde guardamos los datos completos de la API
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
   // Guardamos Filtros: Estado unificado para todos los criterios de filtrado
   const [filters, setFilters] = useState({
-    text: "",
-    technology: "",
-    location: "",
-    level: "",
+    text: searchParams.get("text") || "",
+    technology: searchParams.get("technology") || "",
+    location: searchParams.get("location") || "",
+    level: searchParams.get("level") || "",
   });
 
 
@@ -130,6 +143,19 @@ function SearchPage() {
             [filterName]: value,
         }));
         setCurrentPage(1); // Reiniciar la página al cambiar el filtro
+        
+        const newSearchParams = new URLSearchParams(searchParams);
+
+        if (value) {
+            // Si hay valor, agregarlo a la URL
+            newSearchParams.set(filterName, value);
+        } else {
+            // Si el valor es vacío (filtro deseleccionado), quitarlo de la URL
+            newSearchParams.delete(filterName);
+        }
+
+        // Aplicar los nuevos parámetros a la URL
+        setSearchParams(newSearchParams);
     };
     
     //  EFECTO SECUNDARIO (Título del documento)
@@ -153,7 +179,9 @@ function SearchPage() {
     return (
         <>
             <main>
-                <FiltroCentral onFilterChange={handleFilterChange} />
+                <FiltroCentral onFilterChange={handleFilterChange}
+                currentFilters={filters}
+                />
 
                 <section>
                     <h2 style={{ textAlign: "center" }}>
@@ -176,8 +204,6 @@ function SearchPage() {
     );
 }
 
+
 export default SearchPage;
-
-
-
 

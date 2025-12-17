@@ -1,11 +1,11 @@
-import Link from "./Link"
+import { Link } from "react-router-dom"
 
 
 
 function Header() {
   return (
     <header>
-      <Link href="/" style={{textDecoration: "none"}}>
+      <Link to="/">
         <h1 style={{color: "white"}}>
           <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -17,7 +17,7 @@ function Header() {
       </Link>
 
       <nav> 
-        <Link href="/search">Empleos</Link>
+        < Link to="/search">Empleos</Link>
 
         {/* <a href="/search">Sin SPA</a> */}
       </nav>      
