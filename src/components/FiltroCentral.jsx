@@ -3,10 +3,15 @@ import { useState, useEffect } from "react";
 
 // CORRECCIÓN: Ahora solo recibe onFilterChange como prop principal
 const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
-  //Estado local para el valor del input (para que sea instantáneo al escribir)
+  //1-Estado local para el valor del input (para que sea instantáneo al escribir)
   const [inputValue, setInputValue] = useState(currentFilters.text);
 
-  //Efecto Debounce
+  // 2- EFECTO: Sincronizar el input si el filtro global cambia
+  useEffect(() => {
+    setInputValue(currentFilters.text);
+  }, [currentFilters.text]);
+
+  //3- Efecto Debounce
   useEffect(() => {
     //si el valor local es igual al del filtro global, no hacemos nada
     if (inputValue === currentFilters.text) return;
@@ -22,13 +27,20 @@ const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
     };
   }, [inputValue, currentFilters.text, onFilterChange]);
   
-  // 1- Manejador para el texto (solo actualiza el estado LOCAL)
+  // 4- Manejador para el texto (solo actualiza el estado LOCAL)
   const handleLocalTextChange = (event) => {
     setInputValue(event.target.value); // Actualiza solo el estado LOCAL (rápido)
   };
 
-  
-  // 2- Manejar los Selectores (al cambiar un valor en un select)
+  //5- Manejador para LIMPIAR el input (instantáneo)
+  const handleClearInput = () => {
+    // Limpiamos el estado local inmediatamente para feedback visual
+    setInputValue(""); 
+    // 🚨 IMPORTANTE: Al limpiar, enviamos el cambio DIRECTAMENTE al padre, 
+    // saltándonos el debounce. Si el usuario quiere borrar, lo quiere YA.
+    onFilterChange("text", ""); 
+  };
+  // 6- Manejador para los Selectores
   const handleSelectChange = (event) => {
     const {name, value} = event.target // obtiene el nombre del select: "technology", "location", "level"
     // a) Llama a App.jsx para actualizar el filtro especifico
@@ -54,7 +66,7 @@ const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
         <p>Explora miles de oportunidades en el sector tecnológico.</p>
 
         <form onSubmit={handleSubmit} id="empleos-search-form" role="search">
-          <div className="search-bar">
+          <div className="search-bar" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
               className="icon icon-tabler icons-tabler-outline icon-tabler-search">
@@ -71,6 +83,31 @@ const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
                 onChange={handleLocalTextChange} //filtro de texto instantaneo
                 value={inputValue} //Conectado al estado local
               />
+
+              {/*BOTÓN DE LIMPIAR (Condicional) */}
+              {inputValue && (
+                <button
+                    type="button" // IMPORTANTE: type="button" evita que envíe el formulario
+                    onClick={handleClearInput}
+                    aria-label="Limpiar búsqueda"
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        position: 'absolute', // Lo posicionamos sobre el input
+                        right: '10px',        // Pegado a la derecha
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: '#999' // Un color gris suave para que no compita con la lupa
+                    }}
+                >
+                  {/* Icono de X (SVG) */}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="20" height="20">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+          )}
           </div>
 
           <div className="search-filters">
