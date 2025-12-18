@@ -1,24 +1,36 @@
-// import { useId } from "react";
+import { useState, useEffect } from "react";
 
 
 // CORRECCIÓN: Ahora solo recibe onFilterChange como prop principal
 const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
+  //Estado local para el valor del input (para que sea instantáneo al escribir)
+  const [inputValue, setInputValue] = useState(currentFilters.text);
 
+  //Efecto Debounce
+  useEffect(() => {
+    //si el valor local es igual al del filtro global, no hacemos nada
+    if (inputValue === currentFilters.text) return;
+    
+    //creamos temporizador de 300ms
+    const timeoutId = setTimeout(() => {
+      onFilterChange("text", inputValue);
+    }, 300);
 
-
-  // 1- Manejamos el input text de forma instantanea
-    const handleTextChange = (event) => {
-    const text = event.target.value
-    //a) Envia el texto a la funcion principal y actualiza el filtro "Text"
-    onFilterChange("text", text)
+    //funcion paralimpiar el temporizador
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [inputValue, currentFilters.text, onFilterChange]);
+  
+  // 1- Manejador para el texto (solo actualiza el estado LOCAL)
+  const handleLocalTextChange = (event) => {
+    setInputValue(event.target.value); // Actualiza solo el estado LOCAL (rápido)
   };
 
   
   // 2- Manejar los Selectores (al cambiar un valor en un select)
   const handleSelectChange = (event) => {
-    const name = event.target.name // obtiene el nombre del select: "technology", "location", "level"
-    const value = event.target.value // obtiene el valor del select: "react", "javaScript"
-    
+    const {name, value} = event.target // obtiene el nombre del select: "technology", "location", "level"
     // a) Llama a App.jsx para actualizar el filtro especifico
     onFilterChange(name, value)
   };
@@ -52,16 +64,19 @@ const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
             </svg>
             
               <input 
-                name="text" id="empleos-search-input" required type="text"
+                name="text" 
+                id="empleos-search-input" required 
+                type="text"
                 placeholder="Buscar trabajos, empresas o habilidades"
-                onChange={handleTextChange} //filtro de texto instantaneo
-                value={currentFilters.text}
+                onChange={handleLocalTextChange} //filtro de texto instantaneo
+                value={inputValue} //Conectado al estado local
               />
           </div>
 
           <div className="search-filters">
             {/* El nombre del select debe coincidir con la clave del estado en App.jsx (technology) */}
-            <select name="technology" 
+            <select 
+            name="technology" 
             id="filter-technology" 
             onChange={handleSelectChange}
             value={currentFilters.technology}
@@ -84,7 +99,10 @@ const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
             </select>
 
             {/* Nombre del select debe ser 'location' */}
-            <select name="location" id="filter-location" onChange={handleSelectChange}>
+            <select 
+            name="location" 
+            id="filter-location" 
+            onChange={handleSelectChange}>
               <option value="">Ubicación</option>
               <option value="remoto">Remoto</option>
               <option value="cdmx">Ciudad de México</option>
@@ -94,7 +112,10 @@ const FiltroCentral = ( {onFilterChange, currentFilters} ) => {
             </select>
 
             {/* Nombre del select debe ser 'level' */}
-            <select name="level" id="filter-experience-level" onChange={handleSelectChange}>
+            <select 
+            name="level" 
+            id="filter-experience-level" 
+            onChange={handleSelectChange}>
               <option value="">Nivel de experiencia</option>
               <option value="junior">Junior</option>
               <option value="mid">Mid-level</option>
